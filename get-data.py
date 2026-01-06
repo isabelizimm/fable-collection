@@ -4,14 +4,14 @@ raw_request = requests.get("https://api.fable.co/api/users/529c21d5-fa03-461f-97
 data = raw_request.get("results")
 
 cols = ['book', 'rating', 'review', 'created_at']
-df = pl.DataFrame(data)
-df = df[cols].unnest('book')
+raw = pl.DataFrame(data)
+raw = raw[cols].unnest('book')
 
 new_cols = ['title', 'authors', 'page_count', 'published_date', 'price_usd', 'subjects', 'background_color', 'review_average', 'review_count', 'genres', 'rating', 'review', 'created_at', 'cover_image']
-max_authors = df.select(pl.col("authors").list.len().max()).item()
-max_genres = df.select(pl.col("genres").list.len().max()).item()
+max_authors = raw.select(pl.col("authors").list.len().max()).item()
+max_genres = raw.select(pl.col("genres").list.len().max()).item()
 
-clean = df[new_cols].with_columns(
+clean = raw[new_cols].with_columns(
         (
           pl.col("authors")
           .list.eval(pl.element().struct.field("name"))
