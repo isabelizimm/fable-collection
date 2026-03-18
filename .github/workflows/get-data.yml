@@ -24,11 +24,12 @@ jobs:
         run: |
           uv add requests polars
       - run: uv run get-data.py
+      - run: uv run merge.py
 
       - name: Commit and push changes
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add data/fable.parquet
+          git add data/fable.parquet data/combined.parquet
           git commit -m "Update books"
           git push

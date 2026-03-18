@@ -39,7 +39,7 @@ clean = raw[new_cols].with_columns(
 
 old_books = pl.read_parquet('data/fable.parquet')
 
-concat = pl.concat([clean, old_books]).unique()
+concat = pl.concat([clean, old_books]).unique(subset=["title", "created_at"])
 
 concat.write_parquet('data/fable.parquet')
 
