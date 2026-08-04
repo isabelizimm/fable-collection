@@ -1,11 +1,14 @@
-import requests
 import polars as pl
+import requests
+
 raw_request = requests.get("https://api.fable.co/api/users/529c21d5-fa03-461f-9711-eb061628003f/reviews/?limit=100").json()
 data = raw_request.get("results")
 
 cols = ['book', 'rating', 'review', 'created_at']
 raw = pl.DataFrame(data)
 raw = raw[cols].unnest('book')
+
+genre_6 = pl.lit('').alias('genre_6')
 
 new_cols = ['title', 'authors', 'page_count', 'published_date', 'price_usd', 'subjects', 'background_color', 'review_average', 'review_count', 'genres', 'rating', 'review', 'created_at', 'cover_image']
 max_authors = raw.select(pl.col("authors").list.len().max()).item()
@@ -35,6 +38,7 @@ clean = raw[new_cols].with_columns(
       )\
     .unnest("authors")\
     .unnest("genres")\
+    .insert_column(16, genre_6)\
     .filter(pl.col('created_at') >= pl.lit('2025-01-01').str.to_datetime())
 
 old_books = pl.read_parquet('data/fable.parquet')
